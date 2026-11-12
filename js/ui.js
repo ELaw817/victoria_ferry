@@ -4,6 +4,7 @@
 const $ = id => document.getElementById(id);
 
 let qCache = -1;
+let clueCache = '';
 let toastTimer = null;
 
 // 07:00 → 09:00
@@ -16,7 +17,7 @@ function fmtClock(sec) {
 
 function totalErrors() {
   const e = G.errors;
-  return e.wrongType + e.wrongQty + e.wrongChange;
+  return e.wrongType + e.wrongQty + e.wrongChange + e.wrongCargo + e.wrongAge;
 }
 
 function toast(text) {
@@ -25,6 +26,50 @@ function toast(text) {
   el.hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.hidden = true; }, 1700);
+}
+
+// 年代換裝：招牌、櫃位、成個色調
+function applyEra() {
+  const e = eraOf(G.era);
+  document.body.dataset.era = e.key;
+  $('sign').textContent = e.sign;
+  $('ticketName').textContent = e.counter;
+}
+
+function moodLabel(m) {
+  if (m > 70) return '正常';
+  if (m > 35) return '唔耐煩';
+  return '燥底';
+}
+
+// 窗口嘅提示：有咩貨、細路似唔似大人、查核結果
+function renderClues(hasCust) {
+  const box = $('clues');
+  if (!hasCust) {
+    clueCache = '';
+    box.innerHTML = '';
+    return;
+  }
+
+  const c = G.current;
+  const cargo = cargoLabel(c.cargo);
+  const ver = c.ageChecked ? (c.ageVerdict === 'adult' ? '成人' : '小童') : '';
+  const key = [cargo, c.fakeChild, c.ageChecked, ver, c.age, c.mood <= 35].join('|');
+  if (key === clueCache) return;
+  clueCache = key;
+
+  box.innerHTML = '';
+  const chip = (text, cls) => {
+    const el = document.createElement('span');
+    el.className = 'chip ' + cls;
+    el.textContent = text;
+    box.appendChild(el);
+  };
+
+  if (cargo) chip('貨：' + cargo, 'goods');
+  if (c.fakeChild && !c.ageChecked) chip('個「細路」生晒鬍鬚', 'warn');
+  if (c.ageChecked) chip('查核：' + ver + '（' + c.age + ' 歲）', c.ageVerdict === 'adult' ? 'warn' : 'ok');
+  if (c.mood <= 35) chip('客人燥底', 'warn');
 }
 
 function render() {
@@ -52,19 +97,35 @@ function render() {
   }
   $('queueN').textContent = G.queue.length;
 
+  const qm = G.queue.length
+    ? Math.round(G.queue.reduce((s, c) => s + c.mood, 0) / G.queue.length)
+    : MOOD_MAX;
+  const qmTxt = $('queueMood');
+  qmTxt.textContent = G.queue.length ? '後面：' + moodLabel(qm) : '';
+  qmTxt.className = 'qmood' + (qm <= 35 ? ' bad' : qm <= 70 ? ' warn' : '');
+  $('crowd').classList.toggle('mad', G.queue.length > 0 && qm <= 50);
+
   // 窗口
   const hasCust = !!G.current;
+  const octopus = hasCust && G.current.pay === 'octopus';
   $('cust').classList.toggle('hide', !hasCust);
   $('bubble').classList.toggle('hide', !hasCust);
+  $('payTag').classList.toggle('hide', !hasCust);
   if (hasCust) {
     $('bubble').textContent = G.speech;
     $('cust').style.setProperty('--cust', CUST_COLOURS[G.current.id % CUST_COLOURS.length]);
+    $('cust').classList.toggle('angry', G.current.mood <= 35);
+    $('payTag').textContent = octopus ? '八達通' : '現金';
+    $('payTag').classList.toggle('octo', octopus);
   }
+  renderClues(hasCust);
 
   // 面板
   const pay = G.stage === 'pay';
-  $('orderPane').hidden = pay;
+  const tap = G.stage === 'tap';
+  $('orderPane').hidden = pay || tap;
   $('payPane').hidden = !pay;
+  $('tapPane').hidden = !tap;
 
   // 票種
   document.querySelectorAll('.ticket').forEach(btn => {
@@ -75,15 +136,49 @@ function render() {
     btn.classList.toggle('on', n > 0);
   });
 
-  const total = orderTotal(G.order);
+  // 貨票（只喺有貨嘅客面前出現）
+  const showCargo = G.era === '1990' && hasCust && G.stage === 'order' &&
+    cargoCount(G.current.cargo) > 0;
+  $('cargoPane').hidden = !showCargo;
+  if (showCargo) {
+    document.querySelectorAll('#cargoPane .cargo').forEach(btn => {
+      const n = G.cargo[btn.dataset.cargo] || 0;
+      const q = btn.querySelector('.ck-qty');
+      q.textContent = n;
+      q.classList.toggle('zero', n === 0);
+      btn.classList.toggle('on', n > 0);
+    });
+  }
+
+  // 查核年齡：有買小童票先可以問
+  $('checkAge').hidden = !(hasCust && G.stage === 'order' &&
+    G.current.want.child > 0 && !G.current.ageChecked);
+
+  const people = orderTotal(G.order);
+  const cargo = cargoTotal(G.cargo);
+  const total = people + cargo;
   $('total').textContent = fmt(total);
   $('collectBtn').disabled = total === 0 || !hasCust;
 
   // 找續
-  $('payTotal').textContent = fmt(total);
+  $('payLabel').textContent = hasCust && G.current.pay === 'octopus' ? '貨票（現金）' : '小計';
+  $('payTotal').textContent = fmt(G.cashDue);
   $('payTender').textContent = fmt(G.tender);
   $('changeOut').textContent = fmt(G.change);
   $('confirmBtn').disabled = !hasCust;
+
+  // 拍卡
+  if (tap) {
+    const mood = G.current ? G.current.mood : MOOD_MAX;
+    $('tapAmt').textContent = fmt(people);
+    $('tapDue').textContent = fmt(people);
+    $('moodBar').style.width = mood + '%';
+    $('moodBar').classList.toggle('low', mood <= 35);
+    $('moodTxt').textContent = moodLabel(mood);
+    const locked = G.tapLock > 0;
+    $('tapBtn').disabled = !hasCust || locked;
+    $('tapBtn').textContent = locked ? '等 ' + G.tapLock.toFixed(1) + 's' : '拍卡';
+  }
 }
 
 const CUST_COLOURS = ['#2b2f3a', '#3a2b2b', '#2b3a30', '#332b3a', '#2e3440'];
@@ -92,7 +187,13 @@ function showEnd() {
   $('rRev').textContent = fmt(G.money);
   $('rErr').textContent = totalErrors();
   $('rLeft').textContent = G.leftBehind;
+  $('rCargoRow').hidden = G.era !== '1990';
+  $('rCargo').textContent = G.errors.wrongCargo;
+  $('rAge').textContent = G.errors.wrongAge;
+  $('rTapRow').hidden = G.era !== '1990';
+  $('rTap').textContent = G.taps.fail;
   $('rRank').textContent = rankOf();
+  $('endSub').textContent = eraOf(G.era).name + ' · 07:00–09:00 早高峰';
   $('endView').hidden = false;
 }
 

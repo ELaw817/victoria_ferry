@@ -38,5 +38,5 @@ http.createServer((req, res) => {
     res.end(data);
   });
 }).listen(port, () => {
-  console.log('香江渡輪 dev server: http://127.0.0.1:' + port);
+  console.log('維多利亞小輪 dev server: http://127.0.0.1:' + port);
 });

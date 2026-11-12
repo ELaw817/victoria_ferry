@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>香江渡輪 — 碼頭售票員</title>
+<title>維多利亞小輪 — 碼頭售票員</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -31,13 +31,16 @@
     <div class="queuebar">
       <span>排隊</span>
       <b id="queueN">0</b>
+      <span class="qmood" id="queueMood"></span>
     </div>
 
     <div class="window">
       <div class="glass">
-        <div class="sign">天 星 小 輪 · 一 九 八 〇</div>
+        <div class="sign" id="sign">維 多 利 亞 小 輪 · 一 九 八 〇</div>
+        <div class="paytag hide" id="payTag">現金</div>
         <div class="crowd" id="crowd"></div>
         <div class="bubble" id="bubble">……</div>
+        <div class="clues" id="clues"></div>
         <div class="cust" id="cust"><div class="head"></div><div class="body"></div></div>
       </div>
       <div class="counterlip"><span id="ticketName">售票處</span></div>
@@ -64,8 +67,36 @@
           <span class="tk-qty zero" data-qty="senior">0</span>
         </button>
       </div>
+
+      <div id="cargoPane" hidden>
+        <div class="cargohdr">佢有貨上船 · 貨票只收現金</div>
+        <div class="cargos">
+          <button class="cargo" type="button" data-cargo="tv">
+            <span>電視</span><em>$12</em><b class="ck-qty zero">0</b>
+          </button>
+          <button class="cargo" type="button" data-cargo="fridge">
+            <span>雪櫃</span><em>$15</em><b class="ck-qty zero">0</b>
+          </button>
+          <button class="cargo" type="button" data-cargo="bike">
+            <span>單車</span><em>$8</em><b class="ck-qty zero">0</b>
+          </button>
+          <button class="cargo" type="button" data-cargo="fan">
+            <span>風扇</span><em>$6</em><b class="ck-qty zero">0</b>
+          </button>
+          <button class="cargo" type="button" data-cargo="cooker">
+            <span>電飯煲</span><em>$5</em><b class="ck-qty zero">0</b>
+          </button>
+          <button class="cargo" type="button" data-cargo="ladder">
+            <span>木梯</span><em>$4</em><b class="ck-qty zero">0</b>
+          </button>
+        </div>
+      </div>
+
       <div class="totalrow">
-        <button class="mini" type="button" id="clearOrder">清單</button>
+        <div class="minis">
+          <button class="mini" type="button" id="checkAge" hidden>查核年齡</button>
+          <button class="mini" type="button" id="clearOrder">清單</button>
+        </div>
         <div class="total">小計 <b id="total">$0</b></div>
         <button class="go" type="button" id="collectBtn" disabled>收錢</button>
       </div>
@@ -73,12 +104,15 @@
 
     <div id="payPane" hidden>
       <div class="payinfo">
-        <div><span>小計</span><b id="payTotal">$0</b></div>
+        <div><span id="payLabel">小計</span><b id="payTotal">$0</b></div>
         <div><span>收到</span><b id="payTender">$0</b></div>
         <div class="hl"><span>找續</span><b id="changeOut">$0</b></div>
       </div>
       <p class="hint">搵返「收到 － 小計」嘅數</p>
       <div class="coins">
+        <button class="coin" type="button" data-coin="1000">$10</button>
+        <button class="coin" type="button" data-coin="500">$5</button>
+        <button class="coin" type="button" data-coin="200">$2</button>
         <button class="coin" type="button" data-coin="100">$1</button>
         <button class="coin" type="button" data-coin="50">50¢</button>
         <button class="coin" type="button" data-coin="20">20¢</button>
@@ -90,6 +124,24 @@
       </div>
     </div>
 
+    <div id="tapPane" hidden>
+      <div class="tapinfo">
+        <div class="reader">
+          <div class="lcd" id="tapAmt">$0</div>
+          <div class="wave"></div>
+        </div>
+        <div class="moodbox">
+          <div class="moodline"><span>客人心情</span><b id="moodTxt">正常</b></div>
+          <div class="moodtrack"><span class="moodbar" id="moodBar"></span></div>
+        </div>
+      </div>
+      <p class="hint">拍卡付款 · 拍唔中要再拍，客人會燥</p>
+      <div class="totalrow">
+        <div class="total">應扣 <b id="tapDue">$0</b></div>
+        <button class="go" type="button" id="tapBtn">拍卡</button>
+      </div>
+    </div>
+
   </section>
 
   <div class="toast" id="toast" hidden></div>
@@ -97,13 +149,26 @@
 
 <div class="overlay" id="startView">
   <div class="card">
-    <h2>香江渡輪</h2>
-    <p class="sub">中環碼頭 · 售票員 · 一九八〇</p>
+    <h2>維多利亞小輪</h2>
+    <p class="sub">中環碼頭 · 售票員</p>
+    <div class="eras">
+      <button class="era on" type="button" data-era="1980">
+        <b>一九八〇</b>
+        <span>硬幣 · 紙票</span>
+        <em>數硬幣、找續。慢，但穩。</em>
+      </button>
+      <button class="era" type="button" data-era="1990">
+        <b>一九九〇</b>
+        <span>八達通 · 打印票</span>
+        <em>一撳即過，但會拍唔中。</em>
+      </button>
+    </div>
     <ul class="rules">
       <li>客行到窗口，講要幾多張飛</li>
-      <li>撳票種、撳「收錢」、數硬幣找續</li>
-      <li>開船前 10 秒截龍，上唔到船嘅客會走</li>
-      <li>一更 3 分鐘，等於 07:00–09:00</li>
+      <li>現金要找續，八達通要拍卡</li>
+      <li>1990 年有客托貨上船：貨票只收現金，佢唔會早講</li>
+      <li>「細路」生晒鬍鬚？可以查核年齡（但好人會唔高興）</li>
+      <li>開船前 10 秒截龍，一更 3 分鐘 = 07:00–09:00</li>
     </ul>
     <button class="go wide" type="button" id="startBtn">開工</button>
   </div>
@@ -112,14 +177,18 @@
 <div class="overlay" id="endView" hidden>
   <div class="card">
     <h2>收工</h2>
-    <p class="sub">07:00 — 09:00 早高峰</p>
+    <p class="sub" id="endSub">07:00 — 09:00 早高峰</p>
     <div class="result">
       <div><span>營業額</span><b id="rRev">$0</b></div>
       <div><span>失誤</span><b id="rErr">0</b></div>
       <div><span>上唔到船</span><b id="rLeft">0</b></div>
+      <div id="rCargoRow" hidden><span>貨票出錯</span><b id="rCargo">0</b></div>
+      <div><span>查核漏招</span><b id="rAge">0</b></div>
+      <div id="rTapRow" hidden><span>拍卡失敗</span><b id="rTap">0</b></div>
     </div>
     <p class="rank" id="rRank">—</p>
     <button class="go wide" type="button" id="againBtn">再開一更</button>
+    <button class="mini wide" type="button" id="switchEra">轉年代</button>
   </div>
 </div>
 
