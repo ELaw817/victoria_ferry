@@ -70,7 +70,7 @@ const CFG = {
 
 const ERAS = {
   '1980': { minCust: 8,  maxCust: 11, queueMax: 8,  octopus: 0,    cargoChance: 0,    ... },
-  '1990': { minCust: 13, maxCust: 18, queueMax: 10, octopus: 0.65, cargoChance: 0.38, ... },
+  '1990': { minCust: 13, maxCust: 18, queueMax: 10, octopus: 0.65, cargoChance: 0.32, ... },
 };
 
 const FARES = { adult: 150, child: 80, senior: 50 };   // 單位：仙

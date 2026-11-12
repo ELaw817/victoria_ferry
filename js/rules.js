@@ -68,7 +68,7 @@ const ERAS = {
     arriveFrom: 1,
     arriveTo: 26,        // 1990 客多又密，龍會積
     octopus: 0.65,
-    cargoChance: 0.38,   // 幾多成客帶貨
+    cargoChance: 0.32,   // 幾多成客帶貨
     tapFail: 0.05,
     tapLock: 0.8,
     moodHit: 30,
@@ -150,7 +150,7 @@ function makeCargo(chance) {
   if (Math.random() >= chance) return cargo;
 
   const kind = CARGO_KEYS[randInt(0, CARGO_KEYS.length - 1)];
-  cargo[kind] = Math.random() < 0.18 && CARGO[kind].cent <= 600 ? 2 : 1;
+  cargo[kind] = Math.random() < 0.12 && CARGO[kind].cent <= 600 ? 2 : 1;
   return cargo;
 }
 

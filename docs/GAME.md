@@ -219,7 +219,7 @@
 | 電飯煲 | $5 |
 | 木梯 | $4 |
 
-- 每班船大約 **38%** 客人有貨，多數一件，平嘢間中兩件
+- 每班船大約 **32%** 客人有貨，多數一件，平嘢間中兩件
 - 貨票**只收現金**，一定要同人票分開計
 - 八達通客：先拍人票（人票總額），再收貨票現金
 - 現金客：人票 + 貨票一筆過收，找續照計
@@ -330,7 +330,7 @@ G = {
 
 ```js
 ERAS['1980'] = { minCust: 8,  maxCust: 11, queueMax: 8,  octopus: 0,    cargoChance: 0,    ... }
-ERAS['1990'] = { minCust: 13, maxCust: 18, queueMax: 10, octopus: 0.65, cargoChance: 0.38, ... }
+ERAS['1990'] = { minCust: 13, maxCust: 18, queueMax: 10, octopus: 0.65, cargoChance: 0.32, ... }
 ```
 
 > 加新年代 = 加一個 `ERAS` key，唔使改 `game.js` 嘅流程。
