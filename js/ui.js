@@ -5,6 +5,8 @@ const $ = id => document.getElementById(id);
 
 let qCache = -1;
 let clueCache = '';
+let ageCache = '';
+let lastAgeId = null;
 let toastTimer = null;
 
 // 07:00 → 09:00
@@ -20,12 +22,12 @@ function totalErrors() {
   return e.wrongType + e.wrongQty + e.wrongChange + e.wrongCargo + e.wrongAge;
 }
 
-function toast(text) {
+function toast(text, ms = 1700) {
   const el = $('toast');
   el.textContent = text;
   el.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.hidden = true; }, 1700);
+  toastTimer = setTimeout(() => { el.hidden = true; }, ms);
 }
 
 // 年代換裝：招牌、櫃位、成個色調
@@ -53,8 +55,7 @@ function renderClues(hasCust) {
 
   const c = G.current;
   const cargo = cargoLabel(c.cargo);
-  const ver = c.ageChecked ? (c.ageVerdict === 'adult' ? '成人' : '小童') : '';
-  const key = [cargo, c.fakeChild, c.ageChecked, ver, c.age, c.mood <= 35].join('|');
+  const key = [cargo, c.fakeChild, c.ageChecked, c.mood <= 35].join('|');
   if (key === clueCache) return;
   clueCache = key;
 
@@ -68,8 +69,32 @@ function renderClues(hasCust) {
 
   if (cargo) chip('貨：' + cargo, 'goods');
   if (c.fakeChild && !c.ageChecked) chip('個「細路」生晒鬍鬚', 'warn');
-  if (c.ageChecked) chip('查核：' + ver + '（' + c.age + ' 歲）', c.ageVerdict === 'adult' ? 'warn' : 'ok');
   if (c.mood <= 35) chip('客人燥底', 'warn');
+}
+
+// 查核結果：大字卡片，講清楚啱咗定捉到，同埋張單改咗幾多
+function renderAgeCard(hasCust) {
+  const el = $('ageCard');
+  const c = hasCust ? G.current : null;
+
+  if (!c || !c.ageChecked) {
+    if (!el.hidden) el.hidden = true;
+    ageCache = '';
+    return;
+  }
+
+  const adult = c.ageVerdict === 'adult';
+  const key = c.id + '|' + c.age + '|' + c.ageVerdict;
+  if (key === ageCache) return;
+  ageCache = key;
+
+  el.hidden = false;
+  el.className = 'ageCard ' + (adult ? 'adult' : 'child');
+  el.innerHTML =
+    '<b>查核：' + c.age + ' 歲 · ' + (adult ? '成人' : '小童') + '</b>' +
+    '<span>' + (adult
+      ? '已自動轉成人票，小計 +' + fmt(FARES.adult - FARES.child)
+      : '真係小童 — 但客人唔高興') + '</span>';
 }
 
 function render() {
@@ -119,6 +144,19 @@ function render() {
     $('payTag').classList.toggle('octo', octopus);
   }
   renderClues(hasCust);
+  renderAgeCard(hasCust);
+
+  // 查核完，小計會變：閃一閃個總數，等人知發生咩事
+  const ageId = hasCust && G.current.ageChecked ? G.current.id : null;
+  if (ageId !== lastAgeId) {
+    const t = $('total');
+    t.classList.remove('flash');
+    if (ageId !== null) {
+      void t.offsetWidth;
+      t.classList.add('flash');
+    }
+    lastAgeId = ageId;
+  }
 
   // 面板
   const pay = G.stage === 'pay';

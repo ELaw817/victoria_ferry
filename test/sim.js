@@ -259,6 +259,29 @@ payExactChange();
 check(G.errors.wrongCargo === 0, '貨票啱：唔會記錯');
 check(G.money === 950, '現金收入 = 人票 + 貨票 = $9.5');
 
+// ---- 啱啱好：唔使找 ----
+newGame('1980');
+makeCust({ pay: 'cash' });
+addItem('adult');
+collect();
+G.tender = G.cashDue;      // 客人俾啱啱好
+G.due = 0;
+payExact();
+check(G.current === null && G.money === 150, '啱啱好：唔使找續都收足錢');
+check(G.errors.wrongChange === 0, '啱啱好：唔會記找錯錢');
+
+// ---- 唔啱好但撳「唔使找」：一樣當找錯 ----
+newGame('1980');
+makeCust({ pay: 'cash' });
+addItem('adult');
+collect();
+G.tender = G.cashDue + 100;
+G.due = 100;
+const overTender = G.tender;
+payExact();
+check(G.errors.wrongChange === 1, '唔啱好撳「唔使找」：記找錯錢');
+check(G.money === overTender, '唔啱好撳「唔使找」：冇找錢，實收 = 收到');
+
 console.log(fail ? '\\n' + fail + ' 個檢查失敗' : '\\n全部檢查通過');
 process.exit(fail ? 1 : 0);
 `;

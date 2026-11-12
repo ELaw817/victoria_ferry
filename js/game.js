@@ -163,11 +163,11 @@ function checkAge() {
     // 你已經撳咗小童票嘅話，即刻幫你轉做成人票
     if (G.order.child > 0) { G.order.child--; G.order.adult++; }
     G.speech = AGE_CAUGHT;
-    toast('查核：原來係成人，已轉成人票');
+    toast('查核：原來係成人，已轉成人票', 2600);
   } else {
     c.ageVerdict = 'child';
     G.speech = AGE_CHILD;
-    toast('查核：真係小童 — 客人唔高興');
+    toast('查核：真係小童 — 客人唔高興', 2600);
   }
 }
 
@@ -254,6 +254,13 @@ function addCoin(hao) {
 function resetChange() {
   if (G.stage !== 'pay') return;
   G.change = 0;
+}
+
+// 客人啱啱好：唔使找續，直接收工
+function payExact() {
+  if (!G.current || G.stage !== 'pay' || G.over) return;
+  G.change = 0;
+  confirmChange();
 }
 
 // 核對人票、貨票、查核。回傳原因，順便記低失誤同搞躁條龍。

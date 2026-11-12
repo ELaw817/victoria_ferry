@@ -53,6 +53,7 @@ function bind() {
   $('clearOrder').addEventListener('click', clearOrder);
   $('checkAge').addEventListener('click', checkAge);
   $('resetChange').addEventListener('click', resetChange);
+  $('exactBtn').addEventListener('click', payExact);
   $('collectBtn').addEventListener('click', collect);
   $('confirmBtn').addEventListener('click', confirmChange);
   $('tapBtn').addEventListener('click', tapCard);
@@ -72,6 +73,7 @@ function bind() {
     else if (e.key === '2') addItem('child');
     else if (e.key === '3') addItem('senior');
     else if (e.key === 'q' || e.key === 'Q') checkAge();
+    else if (e.key === '0' && G && G.stage === 'pay') payExact();
     else if (e.key === 'Enter') {
       if (!G || G.over) return;
       if (G.stage === 'order') collect();
