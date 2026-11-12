@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>香江渡輪 — 碼頭售票員</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header class="hud">
+    <div class="clock">
+      <b id="clock">07:00</b>
+      <small id="boatLbl">下一班船 45 秒</small>
+    </div>
+    <div class="stats">
+      <div><span>營業額</span><b id="rev">$0</b></div>
+      <div class="bad"><span>失誤</span><b id="err">0</b></div>
+      <div class="bad"><span>上唔到船</span><b id="left">0</b></div>
+    </div>
+  </header>
+
+  <main class="pier">
+    <div class="board">
+      <span class="route">往 尖沙咀</span>
+      <span class="boatstate" id="boatState">售票中</span>
+    </div>
+
+    <div class="queuebar">
+      <span>排隊</span>
+      <b id="queueN">0</b>
+    </div>
+
+    <div class="window">
+      <div class="glass">
+        <div class="sign">天 星 小 輪 · 一 九 八 〇</div>
+        <div class="crowd" id="crowd"></div>
+        <div class="bubble" id="bubble">……</div>
+        <div class="cust" id="cust"><div class="head"></div><div class="body"></div></div>
+      </div>
+      <div class="counterlip"><span id="ticketName">售票處</span></div>
+    </div>
+  </main>
+
+  <section class="panel">
+
+    <div id="orderPane">
+      <div class="tickets">
+        <button class="ticket" type="button" data-type="adult">
+          <span class="tk-name">成人</span>
+          <span class="tk-price">$1.5</span>
+          <span class="tk-qty zero" data-qty="adult">0</span>
+        </button>
+        <button class="ticket" type="button" data-type="child">
+          <span class="tk-name">小童</span>
+          <span class="tk-price">$0.8</span>
+          <span class="tk-qty zero" data-qty="child">0</span>
+        </button>
+        <button class="ticket" type="button" data-type="senior">
+          <span class="tk-name">長者</span>
+          <span class="tk-price">$0.5</span>
+          <span class="tk-qty zero" data-qty="senior">0</span>
+        </button>
+      </div>
+      <div class="totalrow">
+        <button class="mini" type="button" id="clearOrder">清單</button>
+        <div class="total">小計 <b id="total">$0</b></div>
+        <button class="go" type="button" id="collectBtn" disabled>收錢</button>
+      </div>
+    </div>
+
+    <div id="payPane" hidden>
+      <div class="payinfo">
+        <div><span>小計</span><b id="payTotal">$0</b></div>
+        <div><span>收到</span><b id="payTender">$0</b></div>
+        <div class="hl"><span>找續</span><b id="changeOut">$0</b></div>
+      </div>
+      <p class="hint">搵返「收到 － 小計」嘅數</p>
+      <div class="coins">
+        <button class="coin" type="button" data-coin="100">$1</button>
+        <button class="coin" type="button" data-coin="50">50¢</button>
+        <button class="coin" type="button" data-coin="20">20¢</button>
+        <button class="coin" type="button" data-coin="10">10¢</button>
+      </div>
+      <div class="totalrow">
+        <button class="mini" type="button" id="resetChange">重設</button>
+        <button class="go" type="button" id="confirmBtn">找續 ✓</button>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<div class="overlay" id="startView">
+  <div class="card">
+    <h2>香江渡輪</h2>
+    <p class="sub">中環碼頭 · 售票員 · 一九八〇</p>
+    <ul class="rules">
+      <li>客行到窗口，講要幾多張飛</li>
+      <li>撳票種、撳「收錢」、數硬幣找續</li>
+      <li>開船前 10 秒截龍，上唔到船嘅客會走</li>
+      <li>一更 3 分鐘，等於 07:00–09:00</li>
+    </ul>
+    <button class="go wide" type="button" id="startBtn">開工</button>
+  </div>
+</div>
+
+<div class="overlay" id="endView" hidden>
+  <div class="card">
+    <h2>收工</h2>
+    <p class="sub">07:00 — 09:00 早高峰</p>
+    <div class="result">
+      <div><span>營業額</span><b id="rRev">$0</b></div>
+      <div><span>失誤</span><b id="rErr">0</b></div>
+      <div><span>上唔到船</span><b id="rLeft">0</b></div>
+    </div>
+    <p class="rank" id="rRank">—</p>
+    <button class="go wide" type="button" id="againBtn">再開一更</button>
+  </div>
+</div>
+
+<script src="js/rules.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

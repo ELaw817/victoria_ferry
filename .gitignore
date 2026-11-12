@@ -1,0 +1,17 @@
+# 系統／編輯器垃圾
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 日誌
+*.log
+
+# 暫時檔
+*.tmp
+*.bak
+
+# 依賴（我哋冇，但將來可能有）
+node_modules/
+
+# 個人設定（唔想強制同事跟）
+.vscode/settings.json
