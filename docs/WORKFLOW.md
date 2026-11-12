@@ -277,3 +277,59 @@ const boatSec = 40;      // 對方嘅版本
 | 5 | 用咩溝通 | WhatsApp group 就夠 |
 
 **可以遲啲定**：美術風格、音效、deploy 平台細節、第三個人點分工、商業化。
+
+---
+
+## 9. 換電腦／新同伴點接手
+
+### 9.1 走之前（舊電腦）
+
+```powershell
+cd C:\dev\ferry
+git status        # 要顯示 "nothing to commit, working tree clean"
+git push          # 有嘢未推就推
+```
+
+**唔好帶住未 commit 嘅嘢走。**
+
+### 9.2 新電腦設定
+
+```powershell
+# 1. 裝 git
+winget install --id Git.Git -e --source winget
+
+# 2. 攞落嚟（唔好放 OneDrive）
+mkdir C:\dev
+cd C:\dev
+git clone https://github.com/ELaw817/victoria_ferry.git ferry
+cd ferry
+
+# 3. 設身份
+git config user.name "ELaw817"
+git config user.email "ELaw817@users.noreply.github.com"
+```
+
+### 9.3 喺新電腦開工
+
+1. 喺 **`C:\dev\ferry`** 開 OpenCode
+2. 第一句同 AI 講：
+
+> 讀 `docs/STATUS.md`、`docs/GAME.md`、`docs/WORKFLOW.md`，然後繼續做 v0.2。
+
+**新電腦 = 新對話 = AI 完全冇記憶。** 佢淨係知 repo 入面嘅嘢，所以 `docs/STATUS.md` 一定要最新。
+
+### 9.4 每次開工／收工
+
+```powershell
+git pull          # 開工前
+# ... 做嘢 ...
+git add -A
+git commit -m "做咗咩"
+git push          # 收工
+```
+
+### 9.5 三條紀律
+
+1. **同一時間只喺一部機做。** 兩部機同時改就要 merge，新手會亂。
+2. **唔好留未 commit 嘅嘢過夜。**
+3. **兩部機都唔好放 OneDrive。**
