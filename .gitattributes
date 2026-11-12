@@ -1,0 +1,2 @@
+# 統一換行符，避免 Windows / Mac 之間 diff 成日「成個檔都改咗」
+* text=auto
